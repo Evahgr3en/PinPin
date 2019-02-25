@@ -13,6 +13,8 @@
 		F34FD44B22242DA9006E6F37 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F34FD44922242DA9006E6F37 /* Main.storyboard */; };
 		F34FD44D22242DAB006E6F37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F34FD44C22242DAB006E6F37 /* Assets.xcassets */; };
 		F34FD45022242DAB006E6F37 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F34FD44E22242DAB006E6F37 /* LaunchScreen.storyboard */; };
+		F34FD45822242DDA006E6F37 /* VectorOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = F34FD45722242DDA006E6F37 /* VectorOperations.swift */; };
+		F34FD45A22242DE0006E6F37 /* MotionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F34FD45922242DE0006E6F37 /* MotionHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		F34FD44C22242DAB006E6F37 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F34FD44F22242DAB006E6F37 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F34FD45122242DAB006E6F37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F34FD45722242DDA006E6F37 /* VectorOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VectorOperations.swift; path = ../../PinPin/PinPin/Helper/VectorOperations.swift; sourceTree = "<group>"; };
+		F34FD45922242DE0006E6F37 /* MotionHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MotionHelper.swift; path = ../../PinPin/PinPin/Helper/MotionHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 		F34FD44222242DA8006E6F37 /* PinPin2 */ = {
 			isa = PBXGroup;
 			children = (
+				F34FD45922242DE0006E6F37 /* MotionHelper.swift */,
+				F34FD45722242DDA006E6F37 /* VectorOperations.swift */,
 				F34FD44322242DA9006E6F37 /* AppDelegate.swift */,
 				F34FD44522242DA9006E6F37 /* art.scnassets */,
 				F34FD44722242DA9006E6F37 /* GameViewController.swift */,
@@ -139,8 +145,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F34FD45822242DDA006E6F37 /* VectorOperations.swift in Sources */,
 				F34FD44822242DA9006E6F37 /* GameViewController.swift in Sources */,
 				F34FD44422242DA9006E6F37 /* AppDelegate.swift in Sources */,
+				F34FD45A22242DE0006E6F37 /* MotionHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,115 +7,105 @@
 //
 
 import UIKit
-import QuartzCore
 import SceneKit
 
 class GameViewController: UIViewController {
-
+    
+    var sceneView:SCNView!
+    var scene:SCNScene!
+    
+    var ballNode:SCNNode!
+    var stabilizerNode:SCNNode!
+    var groundNode:SCNNode!
+    
+    var motion = MotionHelper()
+    var motionForce = SCNVector3(0, 0, 0)
+    
+    var sounds:[String:SCNAudioSource] = [:]
+    
+    
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        
-        // create and add a camera to the scene
-        let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        scene.rootNode.addChildNode(cameraNode)
-        
-        // place the camera
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 15)
-        
-        // create and add a light to the scene
-        let lightNode = SCNNode()
-        lightNode.light = SCNLight()
-        lightNode.light!.type = .omni
-        lightNode.position = SCNVector3(x: 0, y: 10, z: 10)
-        scene.rootNode.addChildNode(lightNode)
-        
-        // create and add an ambient light to the scene
-        let ambientLightNode = SCNNode()
-        ambientLightNode.light = SCNLight()
-        ambientLightNode.light!.type = .ambient
-        ambientLightNode.light!.color = UIColor.darkGray
-        scene.rootNode.addChildNode(ambientLightNode)
-        
-        // retrieve the ship node
-        let ship = scene.rootNode.childNode(withName: "ship", recursively: true)!
-        
-        // animate the 3d object
-        ship.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: 2, z: 0, duration: 1)))
-        
-        // retrieve the SCNView
-        let scnView = self.view as! SCNView
-        
-        // set the scene to the view
-        scnView.scene = scene
-        
-        // allows the user to manipulate the camera
-        scnView.allowsCameraControl = true
-        
-        // show statistics such as fps and timing information
-        scnView.showsStatistics = true
-        
-        // configure the view
-        scnView.backgroundColor = UIColor.black
-        
-        // add a tap gesture recognizer
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        scnView.addGestureRecognizer(tapGesture)
+        setupScene()
+        setupNodes()
+        setupSounds()
+        self.sceneView.debugOptions = SCNDebugOptions.showPhysicsShapes
+        self.sceneView.debugOptions = SCNDebugOptions.showBoundingBoxes
     }
     
-    @objc
-    func handleTap(_ gestureRecognize: UIGestureRecognizer) {
-        // retrieve the SCNView
-        let scnView = self.view as! SCNView
+    func setupScene(){
+        sceneView = self.view as! SCNView
+        sceneView.allowsCameraControl = true
+        scene = SCNScene(named: "art.scnassets/MainScene.scn")
+        sceneView.scene = scene
         
-        // check what nodes are tapped
-        let p = gestureRecognize.location(in: scnView)
-        let hitResults = scnView.hitTest(p, options: [:])
-        // check that we clicked on at least one object
+        let tapRecognizer = UITapGestureRecognizer()
+        tapRecognizer.numberOfTapsRequired = 1
+        tapRecognizer.numberOfTouchesRequired = 1
+        
+        tapRecognizer.addTarget(self, action: #selector(GameViewController.sceneViewTapped(recognizer:)))
+        sceneView.addGestureRecognizer(tapRecognizer)
+    }
+    
+    func setupNodes () {
+        ballNode = scene.rootNode.childNode(withName: "Ball", recursively: true)!
+        stabilizerNode = scene.rootNode.childNode(withName: "Stabilizer", recursively: true)!
+        groundNode = scene.rootNode.childNode(withName: "ground", recursively: true)!
+    }
+    
+    func setupSounds() {
+        let jumpSound = SCNAudioSource(fileNamed: "jump.wav")!
+        let hitSound = SCNAudioSource(fileNamed: "hiting.wav")!
+        let rollSound = SCNAudioSource(fileNamed: "rolling.wav")!
+        jumpSound.load()
+        hitSound.load()
+        rollSound.load()
+        jumpSound.volume = 0.4
+        hitSound.volume = 0.4
+        rollSound.volume = 0.3
+        
+        sounds["jump"] = jumpSound
+        sounds["hit"] = hitSound
+        sounds["roll"] = rollSound
+        
+        let bgSound = SCNAudioSource(fileNamed: "background.mp3")!
+        bgSound.volume = 0.1
+        bgSound.loops = true
+        bgSound.load()
+        
+        let musicPlayer = SCNAudioPlayer(source: bgSound)
+        ballNode.addAudioPlayer(musicPlayer)
+        
+        
+    }
+    
+    @objc func sceneViewTapped (recognizer:UITapGestureRecognizer) {
+        let location = recognizer.location(in: sceneView)
+        let hitResults = sceneView.hitTest(location, options: nil)
+        
         if hitResults.count > 0 {
-            // retrieved the first clicked object
-            let result = hitResults[0]
-            
-            // get its material
-            let material = result.node.geometry!.firstMaterial!
-            
-            // highlight it
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.5
-            
-            // on completion - unhighlight
-            SCNTransaction.completionBlock = {
-                SCNTransaction.begin()
-                SCNTransaction.animationDuration = 0.5
-                
-                material.emission.contents = UIColor.black
-                
-                SCNTransaction.commit()
+            let result = hitResults.first
+            if let node = result?.node{
+                if node.name == "Ball" {
+                    let jumpSound = sounds["jump"]!
+                    ballNode.runAction(SCNAction.playAudio(jumpSound, waitForCompletion: false))
+                    ballNode.physicsBody?.applyForce(SCNVector3(0, 4, -2), asImpulse: true)
+                }
             }
-            
-            material.emission.contents = UIColor.red
-            
-            SCNTransaction.commit()
         }
     }
     
     override var shouldAutorotate: Bool {
-        return true
+        return false
     }
     
     override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
-        }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Release any cached data, images, etc that aren't in use.
     }
-
+    
 }
